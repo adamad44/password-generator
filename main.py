@@ -1,160 +1,57 @@
-# Import all modules
+import tkinter as tk
+from tkinter import *
+import random
+import pyperclip
 
+# Create the main Tkinter window
+root = tk.Tk()
+root.title('Password Generator')
+root.geometry('600x500')
+root.config(bg='#252525')
 
-try:
-    from tkinter import *
-    import tkinter as tk
-    from tkinter import filedialog
-    from tkinter import messagebox
-    import os
-    import threading
-    import json
-    import subprocess
-    import sys
-    from win32api import GetSystemMetrics
-    from tkinter import ttk
-    import platform
-except ImportError:
-    # If any modules fail to import, display an error message and quit the program
-    print('There has been an error with importing modules. Please ensure that you have pip installed requirements.txt')
-    quit()
+# Define the characters that can be used to generate the password
+chars = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+         'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+         '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '+', '=', '[', ']', '{', '}', '|', ':', ';', ',', '.', '<', '>', '/', '?']
 
-# Function to check if the operating system is Windows
-def is_windows():
-    return 'windows' in platform.system().strip().lower()
+# Variable to hold the generated password
+password_var = StringVar()
 
-# Main function to set up the text editor
-def main():
-    # Create the main window for the text editor
-    root = tk.Tk()
-    root.title("Text Editor")
-    root.config(bg='#181915')
+# Function to generate a random password
+def generate():
+    # Shuffle the characters to get a random order
+    random.shuffle(chars)
+    # Get the chosen length of the password from the slider
+    length = int(length_slider.get())
+    # Take a sample of the shuffled characters based on the chosen length
+    generated_password = ''.join(random.sample(chars, length))
+    # Set the generated password in the password_var variable
+    password_var.set(generated_password)
 
-    # If the OS is not Windows, show a warning message to the user
-    if not is_windows():
-        ask_windows = messagebox.askyesno('WARNING', 'This text editor is designed to run on Windows 10 and newer only. Do you acknowledge that there may be errors if run otherwise?')
-        if not ask_windows:
-            # If the user clicks 'No' in the warning, quit the program
-            quit()
+# Function to copy the generated password to the clipboard
+def copy_to_clipboard():
+    result_text = password_var.get()
+    pyperclip.copy(result_text)
 
-    # Function to save the content of the text box to the selected file
-    def save_file():
-        try:
-            global file
-            file = open(str(selected_file), 'r+')
-            file.truncate(0)
-            file.write(str(text_box.get("1.0","end")))
-            file.close()
-            messagebox.showinfo("Success", "File saved successfully.")
-        except Exception as e:
-            messagebox.showerror("Error", f"Failed to save file:\n{str(e)}")
+# Create and configure the GUI elements
+title = Label(root, text='Password Generator', font='Verdana 25 bold', bg='#252525', fg='white')
+title.pack(pady=20)
 
-    # Function to run the selected Python file in a separate thread
-    def main_run():
-        python = f'python "{selected_file}"'
-        os.system(python)
+length_label = Label(root, text='Choose Length:', font='Verdana 14', bg='#252525', fg='white')
+length_label.pack()
 
-    # Function to start running the Python file in a new thread
-    def run():
-        x = threading.Thread(target=main_run)
-        x.start()
-saf
-    # Function to choose a file and open it in the text box
-    def choose_file_and_open():
-        try:
-            ask_open = filedialog.askopenfile(initialdir=os.getcwd())
-            global selected_file
-            selected_file = (ask_open.name)
-            global file
-            file = open(str(selected_file), 'r+')
+length_slider = Scale(root, from_=1, to=50, orient=HORIZONTAL, length=200, bg='#252525', fg='white', highlightbackground='#252525', sliderlength=20)
+length_slider.pack()
 
-            text_box.delete(1.0, END)
-            text_box.insert(1.0, file.read())
+gen_button = Button(root, text='Generate', font='Verdana 14', command=generate, bg='#4caf50', fg='white', activebackground='#45a049', activeforeground='white')
+gen_button.pack(pady=10)
 
-            # Update the visibility of the "Run Python" button based on the selected file's extension
-            update_run_button_visibility()
+copy_button = Button(root, text='Copy', font='Verdana 14', command=copy_to_clipboard, bg='#007BFF', fg='white', activebackground='#0056b3', activeforeground='white')
+copy_button.pack(pady=10)
 
-            # Hide the "Choose File" button and show other buttons after opening a file
-            choose_file.pack_forget()
-            save_button.pack(side=LEFT, padx=8, pady=12)
-            choose_file.pack(side=LEFT, padx=8, pady=12)
-            clear_button.pack(side=RIGHT, padx=8, pady=12)
-            delete_file_button.pack(side=RIGHT, padx=8, pady=12)
-        except Exception as e:
-            pass
+result = Label(root, textvariable=password_var, font='Verdana 16', bg='#252525', fg='white')
+result.pack(pady=20)
 
-    # Function to clear the content of the text box
-    def clear():
-        text_box.delete(1.0, END)
-
-    # Function to delete the selected file
-    def delete():
-        ask = messagebox.askyesno('WARNING', f'Would you like to delete this file:\n {selected_file}')
-        if ask:
-            file.close()
-            os.remove(selected_file)
-            clear()
-
-    # Function to update the visibility of the "Run Python" button based on the selected file's extension
-    def update_run_button_visibility():
-        if '.py' in str(selected_file):
-            run_py_button.pack_forget()
-            run_py_button.pack(side=LEFT, padx=8, pady=12)
-        else:
-            run_py_button.pack_forget()
-
-    # Function to open the settings window
-    def open_settings():
-        # Create a new top-level window for settings
-        global master
-        master = Toplevel(root)
-        master.config(bg='#181915')
-        master.geometry(f'{int(GetSystemMetrics(0)/1.9)}x{int(GetSystemMetrics(1)/1.9)}')
-        
-        # Label and entry to adjust text size
-        textsize_label = Label(master, text='Text Size:', bg='#181915', fg='#F8F8F2', font='verdana 17')
-        textsize_label.pack(side=TOP)
-        global textsize_entry
-        textsize_entry = Entry(master, font='verdana 14', bg='grey')
-        textsize_entry.pack(side=TOP)
-        
-        # Submit button to apply the selected text size
-        submit_textsize = Button(master, text='Submit', bg='#181915', fg='#F8F8F2', font='verdana 14', command=font_submit)
-        submit_textsize.pack(side=TOP)
-
-    # Function to submit the selected font size for the text box
-    def font_submit():
-        try:
-            text_size = int(textsize_entry.get())
-            if text_size > 0:
-                text_box.config(font=f'verdana {text_size}')
-                master.destroy()
-            else:
-                # Show an error message if an invalid font size is entered
-                error_textsize.config(text="Invalid font size.")
-                error_textsize.pack()
-        except ValueError:
-            # Show an error message if an invalid font size is entered
-            error_textsize.config(text="Invalid font size.")
-            error_textsize.pack()
-
-    # Create the "Choose File" button
-    choose_file = Button(root, text='Choose File', command=choose_file_and_open, bg='#20211C', font='verdana 13', padx=10, pady=10, fg='#c9c9c5')
-    choose_file.pack(side=BOTTOM, padx=8, pady=12)
-
-    # Create other buttons
-    clear_button = Button(root, text='Clear', command=clear, bg='#20211C', font='verdana 13', padx=10, pady=10, fg='#c9c9c5')
-    delete_file_button = Button(root, text='Delete File', command=delete, bg='#20211C', font='verdana 13', padx=10, pady=10, fg='#c9c9c5')
-    save_button = Button(root, text='Save', command=save_file, bg='#20211C', font='verdana 13', padx=10, pady=10, fg='#c9c9c5')
-    run_py_button = Button(root, text='▶', command=run, font='verdana 13', padx=10, pady=10, bg='#20211C', fg='#F8F8F2')
-
-    # Create the text box
-    text_box = Text(root, bg='#282923', fg='#F8F8F2', font='verdana 13', highlightthickness=0, padx=6, pady=6, height=30, width=140, wrap='none')
-    text_box.pack(padx=8, pady=12)
-
-    # Start the main event loop
-    root.mainloop()
-
-# Run the main function to start the text editor
-if __name__ == "__main__":
-    main()
+# Start the Tkinter event loop
+root.mainloop()
