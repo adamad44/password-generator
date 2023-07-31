@@ -44,10 +44,10 @@ length_label.pack()
 length_slider = Scale(root, from_=1, to=50, orient=HORIZONTAL, length=200, bg='#252525', fg='white', highlightbackground='#252525', sliderlength=20)
 length_slider.pack()
 
-gen_button = Button(root, text='Generate', font='Verdana 14', command=generate, bg='#4caf50', fg='white', activebackground='#45a049', activeforeground='white')
+gen_button = Button(root, text='Generate', font='Verdana 14', command=generate, bg='#a834eb', fg='white', activebackground='#8828bf', activeforeground='white')
 gen_button.pack(pady=10)
 
-copy_button = Button(root, text='Copy', font='Verdana 14', command=copy_to_clipboard, bg='#007BFF', fg='white', activebackground='#0056b3', activeforeground='white')
+copy_button = Button(root, text='Copy', font='Verdana 14', command=copy_to_clipboard, bg='#1c62c9', fg='white', activebackground='#0056b3', activeforeground='white')
 copy_button.pack(pady=10)
 
 result = Label(root, textvariable=password_var, font='Verdana 16', bg='#252525', fg='white')
