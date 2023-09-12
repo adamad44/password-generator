@@ -6,8 +6,13 @@ import pyperclip
 # Create the main Tkinter window
 root = tk.Tk()
 root.title('Password Generator')
-root.geometry('600x500')
+root.geometry('720x500')
 root.config(bg='#252525')
+
+root.minsize(720,500)
+root.maxsize(820,600)
+
+
 
 # Define the characters that can be used to generate the password
 chars = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
@@ -41,7 +46,7 @@ title.pack(pady=20)
 length_label = Label(root, text='Choose Length:', font='Verdana 14', bg='#252525', fg='white')
 length_label.pack()
 
-length_slider = Scale(root, from_=1, to=50, orient=HORIZONTAL, length=200, bg='#252525', fg='white', highlightbackground='#252525', sliderlength=20)
+length_slider = Scale(root, from_=8, to=50, orient=HORIZONTAL, length=200, bg='#252525', fg='white', highlightbackground='#252525', sliderlength=20)
 length_slider.pack()
 
 gen_button = Button(root, text='Generate', font='Verdana 14', command=generate, bg='#a834eb', fg='white', activebackground='#8828bf', activeforeground='white')
